@@ -26,7 +26,13 @@ class ArticleListFragment : Fragment() {
 
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         binding.recyclerView.addItemDecoration(itemDecoration)
+        getArticle()
+        swipeRefresh()
 
+        return binding.root
+    }
+
+    private fun getArticle() {
         visibleProgressBar()
         APIManager.get<Article>("items", {
             val adapter = ArticleAdapter(it)
@@ -36,8 +42,6 @@ class ArticleListFragment : Fragment() {
             // TODO: 通信失敗のダイアログを出す
             goneProgressBar()
         }
-
-        return binding.root
     }
 
 
@@ -45,7 +49,9 @@ class ArticleListFragment : Fragment() {
     ProgressBarを表示させ、画面操作を無効にする
      **/
     private fun visibleProgressBar() {
-        binding.progressBar.visibility = View.VISIBLE
+        if (!binding.swipeRefreshLayout.isRefreshing) {
+            binding.progressBar.visibility = View.VISIBLE
+        }
         activity?.window?.addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
     }
 
@@ -55,6 +61,16 @@ class ArticleListFragment : Fragment() {
     private fun goneProgressBar() {
         binding.progressBar.visibility = View.GONE
         activity?.window?.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+
+        if (binding.swipeRefreshLayout.isRefreshing) {
+            binding.swipeRefreshLayout.isRefreshing = false
+        }
     }
 
+
+    private fun swipeRefresh() {
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            getArticle()
+        }
+    }
 }
