@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sampleqiitaapp.adapter.ArticleAdapter
 import com.example.sampleqiitaapp.data.Article
 import com.example.sampleqiitaapp.databinding.FragmentArticleListBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class ArticleListFragment : Fragment() {
 
@@ -39,8 +40,15 @@ class ArticleListFragment : Fragment() {
             binding.recyclerView.adapter = adapter
             goneProgressBar()
         }) {
-            // TODO: 通信失敗のダイアログを出す
             goneProgressBar()
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("通信に失敗しました")
+                .setMessage("再接続しますか?")
+                .setPositiveButton("再接続") { _, _ ->
+                    getArticle()
+                }
+                .setNegativeButton("閉じる") { _, _ -> }
+                .show()
         }
     }
 

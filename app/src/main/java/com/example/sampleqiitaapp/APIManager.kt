@@ -44,8 +44,10 @@ class APIManager {
 
 
                 } catch (e: Exception) {
-                    Log.e("API", e.toString())
-                    failure()
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Log.e("API", e.toString())
+                        failure()
+                    }
                 }
             }
         }
