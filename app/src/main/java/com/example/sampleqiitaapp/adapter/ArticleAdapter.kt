@@ -65,6 +65,7 @@ class ArticleAdapter(private val articles: List<Article>) :
 
         holder.titleTextView.text = article.title
 
+        holder.tagsTextView.text = ""
 
         article.tags.forEach {
             if (holder.tagsTextView.text.isEmpty()) {
