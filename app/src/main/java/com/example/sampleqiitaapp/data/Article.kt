@@ -8,7 +8,8 @@ data class Article(
     val likes_count: Int,
     val title: String,
     val user: User,
-    val tags: List<Tags>
+    val tags: List<Tags>,
+    val url: String,
 )
 
 

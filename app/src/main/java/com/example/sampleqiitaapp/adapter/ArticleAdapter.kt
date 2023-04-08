@@ -5,6 +5,7 @@ import android.icu.text.SimpleDateFormat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sampleqiitaapp.R
@@ -14,7 +15,10 @@ import java.util.*
 class ArticleAdapter(private val articles: List<Article>) :
     RecyclerView.Adapter<ArticleAdapter.ViewHolder>() {
 
+    lateinit var listener: OnItemClickListener
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        var articleView: LinearLayout
         var userIdTextView: TextView
         var userNameTextView: TextView
         val organizationTextView: TextView
@@ -24,6 +28,7 @@ class ArticleAdapter(private val articles: List<Article>) :
         var likeCountTextView: TextView
 
         init {
+            articleView = view.findViewById(R.id.article_view)
             userIdTextView = view.findViewById(R.id.user_id_textView)
             userNameTextView = view.findViewById(R.id.user_name_textView)
             organizationTextView = view.findViewById(R.id.organization_textView)
@@ -77,6 +82,10 @@ class ArticleAdapter(private val articles: List<Article>) :
 
         holder.likeCountTextView.text = article.likes_count.toString()
 
+        holder.articleView.setOnClickListener {
+            listener.onItemClickListener(it, position, article.url)
+        }
+
     }
 
     /**
@@ -90,5 +99,14 @@ class ArticleAdapter(private val articles: List<Article>) :
 
         val df2 = SimpleDateFormat("yyyy年MM月dd日")
         return df2.format(dt)
+    }
+
+
+    interface OnItemClickListener{
+        fun onItemClickListener(view: View, position: Int, url: String)
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener){
+        this.listener = listener
     }
 }

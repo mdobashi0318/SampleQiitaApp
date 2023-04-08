@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.sampleqiitaapp.adapter.ArticleAdapter
@@ -38,6 +39,11 @@ class ArticleListFragment : Fragment() {
         APIManager.get<Article>("items", {
             val adapter = ArticleAdapter(it)
             binding.recyclerView.adapter = adapter
+            adapter.setOnItemClickListener(object:ArticleAdapter.OnItemClickListener{
+                override fun onItemClickListener(view: View, position: Int, url: String) {
+                    view.findNavController().navigate(ArticleListFragmentDirections.actionArticleListFragmentToArticleDetailFragment(url))
+                }
+            })
             goneProgressBar()
         }) {
             goneProgressBar()
