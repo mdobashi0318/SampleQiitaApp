@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/articleListFragment"
         android:name="com.example.sampleqiitaapp.ArticleListFragment"
-        android:label="fragment_article_list"
+        android:label="@string/app_name"
         tools:layout="@layout/fragment_article_list" >
         <action
             android:id="@+id/action_articleListFragment_to_articleDetailFragment"
@@ -18,7 +18,7 @@
     <fragment
         android:id="@+id/articleDetailFragment"
         android:name="com.example.sampleqiitaapp.ArticleDetailFragment"
-        android:label="fragment_article_detail"
+        android:label="記事"
         tools:layout="@layout/fragment_article_detail" >
         <argument
             android:name="url"
