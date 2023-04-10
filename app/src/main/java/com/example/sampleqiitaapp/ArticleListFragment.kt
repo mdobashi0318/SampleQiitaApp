@@ -1,11 +1,13 @@
 package com.example.sampleqiitaapp
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.fragment.app.Fragment
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,11 +15,17 @@ import com.example.sampleqiitaapp.adapter.ArticleAdapter
 import com.example.sampleqiitaapp.data.Article
 import com.example.sampleqiitaapp.databinding.FragmentArticleListBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 
 class ArticleListFragment : Fragment() {
 
     private lateinit var binding: FragmentArticleListBinding
+    private var date: LocalDateTime? = null
+    private var articles: List<Article> = listOf()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,8 +36,14 @@ class ArticleListFragment : Fragment() {
 
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         binding.recyclerView.addItemDecoration(itemDecoration)
-        getArticle()
         swipeRefresh()
+
+        if (date == null || ChronoUnit.MINUTES.between(date, LocalDateTime.now()) >= 5) {
+            date = LocalDateTime.now()
+            getArticle()
+        } else {
+            setAdapter()
+        }
 
         return binding.root
     }
@@ -37,13 +51,8 @@ class ArticleListFragment : Fragment() {
     private fun getArticle() {
         visibleProgressBar()
         APIManager.get<Article>("items", {
-            val adapter = ArticleAdapter(it)
-            binding.recyclerView.adapter = adapter
-            adapter.setOnItemClickListener(object:ArticleAdapter.OnItemClickListener{
-                override fun onItemClickListener(view: View, position: Int, url: String) {
-                    view.findNavController().navigate(ArticleListFragmentDirections.actionArticleListFragmentToArticleDetailFragment(url))
-                }
-            })
+            articles = it
+            setAdapter()
             goneProgressBar()
         }) {
             goneProgressBar()
@@ -86,5 +95,19 @@ class ArticleListFragment : Fragment() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             getArticle()
         }
+    }
+
+    private fun setAdapter() {
+        val adapter = ArticleAdapter(articles)
+        binding.recyclerView.adapter = adapter
+        adapter.setOnItemClickListener(object : ArticleAdapter.OnItemClickListener {
+            override fun onItemClickListener(view: View, position: Int, url: String) {
+                view.findNavController().navigate(
+                    ArticleListFragmentDirections.actionArticleListFragmentToArticleDetailFragment(
+                        url
+                    )
+                )
+            }
+        })
     }
 }
