@@ -1,23 +1,25 @@
-package com.example.sampleqiitaapp
+package com.example.sampleqiitaapp.screen
 
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.View
-import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.annotation.RequiresApi
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.sampleqiitaapp.APIManager
+import com.example.sampleqiitaapp.R
 import com.example.sampleqiitaapp.adapter.ArticleAdapter
 import com.example.sampleqiitaapp.data.Article
 import com.example.sampleqiitaapp.databinding.FragmentArticleListBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import java.util.*
 
 class ArticleListFragment : Fragment() {
 
@@ -25,13 +27,14 @@ class ArticleListFragment : Fragment() {
     private var date: LocalDateTime? = null
     private var articles: List<Article> = listOf()
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentArticleListBinding.inflate(layoutInflater, container, false)
-
+        addMenu()
         binding.recyclerView.layoutManager = LinearLayoutManager(context)
 
         val itemDecoration = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -46,6 +49,29 @@ class ArticleListFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+
+    private fun addMenu() {
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.article_list_menu, menu)
+            }
+
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.bookmark -> {
+                        view?.findNavController()?.navigate(
+                            ArticleListFragmentDirections.actionArticleListFragmentToBookmarkListFragment()
+                        )
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun getArticle() {
@@ -101,10 +127,16 @@ class ArticleListFragment : Fragment() {
         val adapter = ArticleAdapter(articles)
         binding.recyclerView.adapter = adapter
         adapter.setOnItemClickListener(object : ArticleAdapter.OnItemClickListener {
-            override fun onItemClickListener(view: View, position: Int, url: String) {
+            override fun onItemClickListener(
+                view: View,
+                position: Int,
+                url: String,
+                title: String
+            ) {
                 view.findNavController().navigate(
                     ArticleListFragmentDirections.actionArticleListFragmentToArticleDetailFragment(
-                        url
+                        url,
+                        title
                     )
                 )
             }

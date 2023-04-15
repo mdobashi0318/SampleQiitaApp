@@ -6,7 +6,7 @@
     app:startDestination="@id/articleListFragment">
     <fragment
         android:id="@+id/articleListFragment"
-        android:name="com.example.sampleqiitaapp.ArticleListFragment"
+        android:name="com.example.sampleqiitaapp.screen.ArticleListFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_article_list" >
         <action
@@ -14,14 +14,29 @@
             app:destination="@id/articleDetailFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
+        <action
+            android:id="@+id/action_articleListFragment_to_bookmarkListFragment"
+            app:destination="@id/bookmarkListFragment" />
     </fragment>
     <fragment
         android:id="@+id/articleDetailFragment"
-        android:name="com.example.sampleqiitaapp.ArticleDetailFragment"
+        android:name="com.example.sampleqiitaapp.screen.ArticleDetailFragment"
         android:label="記事"
         tools:layout="@layout/fragment_article_detail" >
         <argument
             android:name="url"
             app:argType="string" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/bookmarkListFragment"
+        android:name="com.example.sampleqiitaapp.screen.BookmarkListFragment"
+        android:label="ブックマーク"
+        tools:layout="@layout/fragment_bookmark_list" >
+        <action
+            android:id="@+id/action_bookmarkListFragment_to_articleDetailFragment"
+            app:destination="@id/articleDetailFragment" />
     </fragment>
 </navigation>

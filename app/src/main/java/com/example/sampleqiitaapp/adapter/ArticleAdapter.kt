@@ -83,7 +83,7 @@ class ArticleAdapter(private val articles: List<Article>) :
         holder.likeCountTextView.text = article.likes_count.toString()
 
         holder.articleView.setOnClickListener {
-            listener.onItemClickListener(it, position, article.url)
+            listener.onItemClickListener(it, position, article.url, article.title)
         }
 
     }
@@ -103,7 +103,7 @@ class ArticleAdapter(private val articles: List<Article>) :
 
 
     interface OnItemClickListener{
-        fun onItemClickListener(view: View, position: Int, url: String)
+        fun onItemClickListener(view: View, position: Int, url: String, title: String)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener){
