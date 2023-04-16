@@ -63,6 +63,7 @@ class ArticleDetailFragment : Fragment() {
                         CoroutineScope(Dispatchers.Default).launch {
                             dao.add(
                                 Bookmark(
+                                    naviArgs.id,
                                     naviArgs.title,
                                     naviArgs.url
                                 )
@@ -83,6 +84,7 @@ class ArticleDetailFragment : Fragment() {
                         CoroutineScope(Dispatchers.Default).launch {
                             dao.delete(
                                 Bookmark(
+                                    naviArgs.id,
                                     naviArgs.title,
                                     naviArgs.url
                                 )

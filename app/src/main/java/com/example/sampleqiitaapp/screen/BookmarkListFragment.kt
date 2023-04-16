@@ -46,11 +46,13 @@ class BookmarkListFragment : Fragment() {
                     override fun onItemClickListener(
                         view: View,
                         position: Int,
+                        id: String,
                         url: String,
                         title: String
                     ) {
                         view.findNavController().navigate(
                             BookmarkListFragmentDirections.actionBookmarkListFragmentToArticleDetailFragment(
+                                id,
                                 url,
                                 title
                             )

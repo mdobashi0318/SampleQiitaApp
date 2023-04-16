@@ -10,6 +10,7 @@ data class Article(
     val user: User,
     val tags: List<Tags>,
     val url: String,
+    val id: String,
 )
 
 

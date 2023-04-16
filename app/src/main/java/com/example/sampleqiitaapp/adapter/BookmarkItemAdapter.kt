@@ -37,19 +37,19 @@ class BookmarkItemAdapter(private val bookmarks: List<Bookmark>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val bookmark = bookmarks[position]
 
-holder.titleTextView.text = bookmark.title
+        holder.titleTextView.text = bookmark.title
         holder.bookmarkView.setOnClickListener {
-            listener.onItemClickListener(it, position, bookmark.url, bookmark.title)
+            listener.onItemClickListener(it, position, bookmark.id, bookmark.url, bookmark.title)
         }
 
     }
 
 
-    interface OnItemClickListener{
-        fun onItemClickListener(view: View, position: Int, url: String, title: String)
+    interface OnItemClickListener {
+        fun onItemClickListener(view: View, position: Int, id: String, url: String, title: String)
     }
 
-    fun setOnItemClickListener(listener: OnItemClickListener){
+    fun setOnItemClickListener(listener: OnItemClickListener) {
         this.listener = listener
     }
 }

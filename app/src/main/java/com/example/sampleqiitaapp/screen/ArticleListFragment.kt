@@ -130,11 +130,13 @@ class ArticleListFragment : Fragment() {
             override fun onItemClickListener(
                 view: View,
                 position: Int,
+                id: String,
                 url: String,
                 title: String
             ) {
                 view.findNavController().navigate(
                     ArticleListFragmentDirections.actionArticleListFragmentToArticleDetailFragment(
+                        id,
                         url,
                         title
                     )

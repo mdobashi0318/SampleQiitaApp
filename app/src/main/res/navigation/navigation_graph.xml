@@ -8,7 +8,7 @@
         android:id="@+id/articleListFragment"
         android:name="com.example.sampleqiitaapp.screen.ArticleListFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_article_list" >
+        tools:layout="@layout/fragment_article_list">
         <action
             android:id="@+id/action_articleListFragment_to_articleDetailFragment"
             app:destination="@id/articleDetailFragment"
@@ -22,19 +22,23 @@
         android:id="@+id/articleDetailFragment"
         android:name="com.example.sampleqiitaapp.screen.ArticleDetailFragment"
         android:label="記事"
-        tools:layout="@layout/fragment_article_detail" >
+        tools:layout="@layout/fragment_article_detail">
+        <argument
+            android:name="id"
+            app:argType="string" />
         <argument
             android:name="url"
             app:argType="string" />
         <argument
             android:name="title"
             app:argType="string" />
+
     </fragment>
     <fragment
         android:id="@+id/bookmarkListFragment"
         android:name="com.example.sampleqiitaapp.screen.BookmarkListFragment"
         android:label="ブックマーク"
-        tools:layout="@layout/fragment_bookmark_list" >
+        tools:layout="@layout/fragment_bookmark_list">
         <action
             android:id="@+id/action_bookmarkListFragment_to_articleDetailFragment"
             app:destination="@id/articleDetailFragment" />
