@@ -70,7 +70,7 @@ class ArticleDetailFragment : Fragment() {
                             )
                             CoroutineScope(Dispatchers.Main).launch {
                                 MaterialAlertDialogBuilder(requireContext())
-                                    .setMessage("ブックマークに追加しました。")
+                                    .setTitle("ブックマークに追加しました。")
                                     .setPositiveButton(R.string.ok) { _, _ ->
                                         addMenu()
                                     }
@@ -91,7 +91,7 @@ class ArticleDetailFragment : Fragment() {
                             )
                             CoroutineScope(Dispatchers.Main).launch {
                                 MaterialAlertDialogBuilder(requireContext())
-                                    .setMessage("ブックマークから削除しました。")
+                                    .setTitle("ブックマークから削除しました。")
                                     .setPositiveButton(R.string.ok) { _, _ ->
                                         addMenu()
                                     }
