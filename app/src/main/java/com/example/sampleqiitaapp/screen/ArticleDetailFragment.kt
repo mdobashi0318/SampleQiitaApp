@@ -2,6 +2,7 @@ package com.example.sampleqiitaapp.screen
 
 import android.os.Bundle
 import android.view.*
+import android.webkit.WebViewClient
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -29,6 +30,7 @@ class ArticleDetailFragment : Fragment() {
     ): View {
 
         binding = FragmentArticleDetailBinding.inflate(layoutInflater, container, false)
+        binding.webView.webViewClient = WebViewClient()
         binding.webView.loadUrl(naviArgs.url)
         addMenu()
         return binding.root
