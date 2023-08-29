@@ -21,7 +21,7 @@ class APIManager {
 
         inline fun <reified T> get(
             api: String,
-            crossinline success: (List<T>) -> Unit,
+            crossinline success: (T) -> Unit,
             crossinline failure: () -> Unit
         ) {
             val request = Request.Builder()
@@ -35,7 +35,7 @@ class APIManager {
                     }
 
                     response.body?.let {
-                        val list: List<T> = json.decodeFromString(it.string())
+                        val list: T = json.decodeFromString(it.string())
                         CoroutineScope(Dispatchers.Main).launch {
                             success(list)
                         }

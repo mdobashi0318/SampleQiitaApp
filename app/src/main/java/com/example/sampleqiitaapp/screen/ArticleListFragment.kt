@@ -75,7 +75,7 @@ class ArticleListFragment : Fragment() {
 
     private fun getArticle() {
         visibleProgressBar()
-        APIManager.get<Article>("items", {
+        APIManager.get<List<Article>>("items", {
             articles = it
             setAdapter()
             goneProgressBar()

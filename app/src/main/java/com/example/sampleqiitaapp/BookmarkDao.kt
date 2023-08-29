@@ -10,8 +10,8 @@ interface BookmarkDao {
     @Query("SELECT * FROM bookmark_table")
     suspend fun getAll(): List<Bookmark>
 
-    @Query("SELECT * FROM bookmark_table WHERE url == :url")
-    suspend fun getBookmark(url: String): Bookmark?
+    @Query("SELECT * FROM bookmark_table WHERE id == :id")
+    suspend fun getBookmark(id: String): Bookmark?
 
     @Insert
     suspend fun add(bm: Bookmark)
