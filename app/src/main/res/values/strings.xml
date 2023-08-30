@@ -2,4 +2,8 @@
     <string name="app_name">ReadQiitaApp</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="ok">OK</string>
+    <string name="cancel">キャンセル</string>
+
+    <string name="bookmark_delete_message">ブックマークから削除しました。</string>
+
 </resources>

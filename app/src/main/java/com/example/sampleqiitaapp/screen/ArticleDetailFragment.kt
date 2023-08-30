@@ -6,6 +6,7 @@ import android.webkit.WebViewClient
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.sampleqiitaapp.APIManager
 import com.example.sampleqiitaapp.data.Bookmark
@@ -108,7 +109,7 @@ class ArticleDetailFragment : Fragment() {
 
                             CoroutineScope(Dispatchers.Main).launch {
                                 MaterialAlertDialogBuilder(requireContext())
-                                    .setTitle("ブックマークから削除しました。")
+                                    .setTitle(R.string.bookmark_delete_message)
                                     .setPositiveButton(R.string.ok) { _, _ ->
                                         getBookmark()
                                     }
@@ -138,7 +139,27 @@ class ArticleDetailFragment : Fragment() {
                     CoroutineScope(Dispatchers.Default).launch {
                         dao.update(Bookmark(it.id, it.title, it.url, bookmark.created_at, nowStr()))
                     }
-                }) {}
+                }) {
+                    MaterialAlertDialogBuilder(requireContext())
+                        .setTitle("記事が見つかりませんでした。")
+                        .setMessage("記事が削除された可能性があります。ブックマークを削除しますか?")
+                        .setPositiveButton(R.string.ok) { _, _ ->
+                            CoroutineScope(Dispatchers.Default).launch {
+                                dao.delete(bookmark)
+                            }
+
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle(R.string.bookmark_delete_message)
+                                .setPositiveButton(R.string.ok) { _, _ ->
+                                    view?.findNavController()
+                                        ?.navigate(R.id.action_articleDetailFragment_to_bookmarkListFragment)
+                                }
+                                .show()
+
+                        }
+                        .setNegativeButton(R.string.cancel) { _, _ -> }
+                        .show()
+                }
             }
         }
     }
