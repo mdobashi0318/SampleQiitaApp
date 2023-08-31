@@ -41,6 +41,13 @@ class ArticleDetailFragment : Fragment() {
         binding.webView.webViewClient = WebViewClient()
         binding.webView.loadUrl(naviArgs.url)
         getBookmark()
+
+        binding.webView.setOnKeyListener { _, keyCode, event ->
+            (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN && binding.webView.canGoBack()).apply {
+                binding.webView.goBack()
+            }
+        }
+
         return binding.root
     }
 
