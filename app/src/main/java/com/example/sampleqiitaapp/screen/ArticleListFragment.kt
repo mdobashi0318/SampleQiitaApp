@@ -1,32 +1,27 @@
 package com.example.sampleqiitaapp.screen
 
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
-import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.sampleqiitaapp.APIManager
 import com.example.sampleqiitaapp.R
 import com.example.sampleqiitaapp.adapter.ArticleAdapter
-import com.example.sampleqiitaapp.data.Article
 import com.example.sampleqiitaapp.databinding.FragmentArticleListBinding
+import com.example.sampleqiitaapp.viewmodels.ArticleListViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import java.time.LocalDateTime
-import java.time.temporal.ChronoUnit
-import java.util.*
 
 class ArticleListFragment : Fragment() {
 
     private lateinit var binding: FragmentArticleListBinding
-    private var date: LocalDateTime? = null
-    private var articles: List<Article> = listOf()
 
+    private val viewModel: ArticleListViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,12 +35,7 @@ class ArticleListFragment : Fragment() {
         binding.recyclerView.addItemDecoration(itemDecoration)
         swipeRefresh()
 
-        if (date == null || ChronoUnit.MINUTES.between(date, LocalDateTime.now()) >= 5) {
-            date = LocalDateTime.now()
-            getArticle()
-        } else {
-            setAdapter()
-        }
+        if (viewModel.getArticleFlag()) getArticle() else setAdapter()
 
         return binding.root
     }
@@ -67,6 +57,7 @@ class ArticleListFragment : Fragment() {
                         )
                         true
                     }
+
                     else -> false
                 }
             }
@@ -75,22 +66,16 @@ class ArticleListFragment : Fragment() {
 
     private fun getArticle() {
         visibleProgressBar()
-        APIManager.get<List<Article>>("items", {
-            articles = it
+        viewModel.getArticle({
             setAdapter()
             goneProgressBar()
         }) {
             goneProgressBar()
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle("通信に失敗しました")
-                .setMessage("再接続しますか?")
-                .setPositiveButton("再接続") { _, _ ->
-                    getArticle()
-                }
-                .setNegativeButton("閉じる") { _, _ -> }
-                .show()
+            failureDialog()
         }
+
     }
+
 
 
     /**
@@ -123,7 +108,7 @@ class ArticleListFragment : Fragment() {
     }
 
     private fun setAdapter() {
-        val adapter = ArticleAdapter(articles)
+        val adapter = ArticleAdapter(viewModel.articles.value ?: listOf())
         binding.recyclerView.adapter = adapter
         adapter.setOnItemClickListener(object : ArticleAdapter.OnItemClickListener {
             override fun onItemClickListener(
@@ -143,4 +128,17 @@ class ArticleListFragment : Fragment() {
             }
         })
     }
+
+/**
+ * 記事取得の通信失敗のダイアログを表示する
+ * */
+    private fun failureDialog(): AlertDialog =
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("通信に失敗しました")
+            .setMessage("再接続しますか?")
+            .setPositiveButton("再接続") { _, _ ->
+                getArticle()
+            }
+            .setNegativeButton("閉じる") { _, _ -> }
+            .show()
 }
