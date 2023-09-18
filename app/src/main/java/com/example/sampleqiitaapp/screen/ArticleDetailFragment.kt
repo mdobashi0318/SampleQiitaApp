@@ -67,6 +67,7 @@ class ArticleDetailFragment : Fragment() {
                             .setPositiveButton(R.string.ok) { _, _ ->
                                 getBookmark()
                             }
+                            .setCancelable(false)
                             .show()
                         return true
                     }
@@ -78,6 +79,7 @@ class ArticleDetailFragment : Fragment() {
                             .setPositiveButton(R.string.ok) { _, _ ->
                                 getBookmark()
                             }
+                            .setCancelable(false)
                             .show()
 
                         return true
@@ -106,10 +108,12 @@ class ArticleDetailFragment : Fragment() {
                             view?.findNavController()
                                 ?.navigate(R.id.action_articleDetailFragment_to_bookmarkListFragment)
                         }
+                        .setCancelable(false)
                         .show()
 
                 }
                 .setNegativeButton(R.string.cancel) { _, _ -> }
+                .setCancelable(false)
                 .show()
         }
     }

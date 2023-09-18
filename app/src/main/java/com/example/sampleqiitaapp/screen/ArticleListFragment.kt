@@ -140,5 +140,6 @@ class ArticleListFragment : Fragment() {
                 getArticle()
             }
             .setNegativeButton("閉じる") { _, _ -> }
+            .setCancelable(false)
             .show()
 }
