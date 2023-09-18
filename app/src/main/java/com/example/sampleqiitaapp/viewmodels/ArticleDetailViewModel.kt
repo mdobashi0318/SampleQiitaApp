@@ -57,7 +57,7 @@ class ArticleDetailViewModel : ViewModel() {
     }
 
     /**
-     * ブックマーク更新日時が１日以上経過していたら更新する
+     * ブックマーク更新日時が1時間以上経過していたら更新する
      */
     fun update(
         failure: () -> Unit
@@ -66,7 +66,7 @@ class ArticleDetailViewModel : ViewModel() {
             if (ChronoUnit.SECONDS.between(
                     fromStringToDate(bookmark.updated_at),
                     now()
-                ) >= 60 * 60 * 24
+                ) >= 60 * 60
             ) {
                 APIManager.get<Article>("items/${bookmark.id}", {
                     CoroutineScope(Dispatchers.Default).launch {
