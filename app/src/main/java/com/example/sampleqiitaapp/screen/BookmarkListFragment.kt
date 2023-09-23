@@ -90,12 +90,18 @@ class BookmarkListFragment : Fragment() {
                         MaterialAlertDialogBuilder(requireContext())
                             .setTitle(R.string.bookmark_deleteAll_confirm_delete_message)
                             .setPositiveButton(R.string.ok) { _, _ ->
-                                viewModel.deleteAllBookmark {
+                                viewModel.deleteAllBookmark ({
                                     MaterialAlertDialogBuilder(requireContext())
                                         .setTitle(R.string.bookmark_delete_message)
                                         .setPositiveButton(R.string.ok) { _, _ ->
                                             setItemAdapter()
                                         }
+                                        .setCancelable(false)
+                                        .show()
+                                }) {
+                                    MaterialAlertDialogBuilder(requireContext())
+                                        .setTitle("ブックマークの削除に失敗しました。")
+                                        .setPositiveButton(R.string.ok) { _, _ -> }
                                         .setCancelable(false)
                                         .show()
                                 }
