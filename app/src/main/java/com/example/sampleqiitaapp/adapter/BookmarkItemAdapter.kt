@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.sampleqiitaapp.data.Bookmark
 import com.example.sampleqiitaapp.R
 
-class BookmarkItemAdapter(private val bookmarks: List<Bookmark>) :
+class BookmarkItemAdapter(val bookmarks: List<Bookmark>) :
     RecyclerView.Adapter<BookmarkItemAdapter.ViewHolder>() {
 
-    lateinit var listener: OnItemClickListener
+    private lateinit var listener: OnItemClickListener
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var bookmarkView: LinearLayout

@@ -6,21 +6,17 @@ import android.webkit.WebViewClient
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.sampleqiitaapp.APIManager
-import com.example.sampleqiitaapp.data.Bookmark
-import com.example.sampleqiitaapp.QiitaApplication
+import com.example.sampleqiitaapp.ErrorType
 import com.example.sampleqiitaapp.R
-import com.example.sampleqiitaapp.data.Article
 import com.example.sampleqiitaapp.databinding.FragmentArticleDetailBinding
+import com.example.sampleqiitaapp.viewmodels.ArticleDetailViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.temporal.ChronoUnit
 
 class ArticleDetailFragment : Fragment() {
 
@@ -28,33 +24,23 @@ class ArticleDetailFragment : Fragment() {
 
     private val naviArgs: ArticleDetailFragmentArgs by navArgs()
 
-    private val dao = QiitaApplication.database.bookmarkDao()
-
-    private var bookmark: Bookmark? = null
+    private val viewModel: ArticleDetailViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        viewModel.setArgs(naviArgs.id, naviArgs.title, naviArgs.url)
         binding = FragmentArticleDetailBinding.inflate(layoutInflater, container, false)
         binding.webView.webViewClient = WebViewClient()
-        binding.webView.loadUrl(naviArgs.url)
-        getBookmark()
-
+        binding.webView.loadUrl(viewModel.url)
         binding.webView.setOnKeyListener { _, keyCode, event ->
             (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN && binding.webView.canGoBack()).apply {
                 binding.webView.goBack()
             }
         }
-
+        getBookmark()
         return binding.root
-    }
-
-
-    override fun onResume() {
-        super.onResume()
-        updateBookmark()
     }
 
 
@@ -63,66 +49,41 @@ class ArticleDetailFragment : Fragment() {
         menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.detail_menu, menu)
-                CoroutineScope(Dispatchers.Main).launch {
-                    if (bookmark == null) {
-                        menu.getItem(0).isVisible = true
-                        menu.getItem(1).isVisible = false
-                    } else {
-                        menu.getItem(0).isVisible = false
-                        menu.getItem(1).isVisible = true
-                    }
+                if (viewModel.bookmark.value == null) {
+                    menu.getItem(BookmarkMenuItem.Add.value).isVisible = true
+                    menu.getItem(BookmarkMenuItem.Remove.value).isVisible = false
+                } else {
+                    menu.getItem(BookmarkMenuItem.Add.value).isVisible = false
+                    menu.getItem(BookmarkMenuItem.Remove.value).isVisible = true
                 }
             }
 
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                val date = nowStr()
                 when (menuItem.itemId) {
                     R.id.add_bookmark -> {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            dao.add(
-                                Bookmark(
-                                    naviArgs.id,
-                                    naviArgs.title,
-                                    naviArgs.url,
-                                    date,
-                                    date
-                                )
-
-                            )
-                            CoroutineScope(Dispatchers.Main).launch {
-                                MaterialAlertDialogBuilder(requireContext())
-                                    .setTitle("ブックマークに追加しました。")
-                                    .setPositiveButton(R.string.ok) { _, _ ->
-                                        getBookmark()
-                                    }
-                                    .show()
-                            }
+                        viewModel.add({
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("ブックマークに追加しました。")
+                                .setPositiveButton(R.string.ok) { _, _ ->
+                                    getBookmark()
+                                }
+                                .setCancelable(false)
+                                .show()
+                        }) {
+                            MaterialAlertDialogBuilder(requireContext())
+                                .setTitle("ブックマークの追加に失敗しました。")
+                                .setPositiveButton(R.string.ok) { _, _ -> }
+                                .setCancelable(false)
+                                .show()
                         }
+
                         return true
                     }
 
                     R.id.remove_bookmark -> {
-                        CoroutineScope(Dispatchers.Default).launch {
-                            dao.delete(
-                                Bookmark(
-                                    naviArgs.id,
-                                    naviArgs.title,
-                                    naviArgs.url,
-                                    date,
-                                    date
-                                )
-                            )
+                        deleteBookmark()
 
-                            CoroutineScope(Dispatchers.Main).launch {
-                                MaterialAlertDialogBuilder(requireContext())
-                                    .setTitle(R.string.bookmark_delete_message)
-                                    .setPositiveButton(R.string.ok) { _, _ ->
-                                        getBookmark()
-                                    }
-                                    .show()
-                            }
-                        }
                         return true
                     }
 
@@ -132,67 +93,80 @@ class ArticleDetailFragment : Fragment() {
         }, viewLifecycleOwner)
     }
 
+    private fun deleteBookmark() {
+        viewModel.delete({
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.bookmark_delete_message)
+                .setPositiveButton(R.string.ok) { _, _ ->
+                    getBookmark()
+                }
+                .setCancelable(false)
+                .show()
+        }) {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("ブックマークの削除に失敗しました。")
+                .setPositiveButton(R.string.ok) { _, _ -> }
+                .setCancelable(false)
+                .show()
+        }
+
+    }
+
+
     /**
-     * ブックマーク更新日時が１日以上経過していたら更新する
+     * ブックマークを更新する
      */
     private fun updateBookmark() {
-        bookmark?.let { bookmark ->
-            if (ChronoUnit.SECONDS.between(
-                    fromStringToDate(bookmark.updated_at),
-                    now()
-                ) >= 60 * 60 * 24
-            ) {
-                APIManager.get<Article>("items/${bookmark.id}", {
-                    CoroutineScope(Dispatchers.Default).launch {
-                        dao.update(Bookmark(it.id, it.title, it.url, bookmark.created_at, nowStr()))
-                    }
-                }) {
-                    MaterialAlertDialogBuilder(requireContext())
-                        .setTitle("記事が見つかりませんでした。")
-                        .setMessage("記事が削除された可能性があります。ブックマークを削除しますか?")
-                        .setPositiveButton(R.string.ok) { _, _ ->
-                            CoroutineScope(Dispatchers.Default).launch {
-                                dao.delete(bookmark)
-                            }
-
-                            MaterialAlertDialogBuilder(requireContext())
-                                .setTitle(R.string.bookmark_delete_message)
-                                .setPositiveButton(R.string.ok) { _, _ ->
-                                    view?.findNavController()
-                                        ?.navigate(R.id.action_articleDetailFragment_to_bookmarkListFragment)
-                                }
-                                .show()
-
-                        }
-                        .setNegativeButton(R.string.cancel) { _, _ -> }
-                        .show()
-                }
+        viewModel.update {
+            if (it == ErrorType.API) {
+                apiErrorDialog()
+            } else {
+                dbErrorDialog()
             }
         }
     }
 
 
     private fun getBookmark() {
-        CoroutineScope(Dispatchers.Default).launch {
-            bookmark = dao.getBookmark(naviArgs.id)
+        CoroutineScope(Dispatchers.Main).launch {
+            viewModel.get()
+            if (viewModel.bookmark.value != null) updateBookmark()
+            addMenu()
         }
-        addMenu()
+    }
+
+    private enum class BookmarkMenuItem(val value: Int) {
+        Add(0),
+        Remove(1)
     }
 
 
-    private fun fromStringToDate(str: String): LocalDateTime {
-        val dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
-        return LocalDateTime.parse(str, dtf)
+    private val apiErrorDialog = {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("記事が見つかりませんでした。")
+            .setMessage("記事が削除された可能性があります。ブックマークを削除しますか?")
+            .setPositiveButton(R.string.ok) { _, _ ->
+                deleteBookmark()
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.bookmark_delete_message)
+                    .setPositiveButton(R.string.ok) { _, _ ->
+                        view?.findNavController()
+                            ?.navigate(R.id.action_articleDetailFragment_to_bookmarkListFragment)
+                    }
+                    .setCancelable(false)
+                    .show()
+
+            }
+            .setNegativeButton(R.string.cancel) { _, _ -> }
+            .setCancelable(false)
+            .show()
     }
 
-    private fun now(): LocalDateTime {
-        val dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
-        return LocalDateTime.parse(LocalDateTime.now().format(dtf), dtf)
+    private val dbErrorDialog = {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("更新に失敗しました")
+            .setPositiveButton(R.string.ok) { _, _ -> }
+            .setCancelable(false)
+            .show()
     }
-
-    private fun nowStr(): String {
-        val dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss")
-        return LocalDateTime.now().format(dtf)
-    }
-
 }

@@ -5,5 +5,8 @@
     <string name="cancel">キャンセル</string>
 
     <string name="bookmark_delete_message">ブックマークから削除しました。</string>
+    <string name="bookmark_deleteAll_confirm_delete_message">ブックマークを全件削除しますか?</string>
+
+    <string name="no_bookmark_message">ブックマークがありません</string>
 
 </resources>
