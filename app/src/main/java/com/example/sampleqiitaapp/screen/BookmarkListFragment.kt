@@ -41,6 +41,10 @@ class BookmarkListFragment : Fragment() {
         CoroutineScope(Dispatchers.Main).launch {
             viewModel.getBookmarkList()
             val adapter = BookmarkItemAdapter(viewModel.bookmarks.value ?: listOf())
+            if (adapter.bookmarks.isEmpty()) {
+                binding.noBookmarkItemView.noBookmarkView.visibility = View.VISIBLE
+            }
+            
             binding.recyclerView.adapter = adapter
             adapter.setOnItemClickListener(object : BookmarkItemAdapter.OnItemClickListener {
                 override fun onItemClickListener(

@@ -5,6 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".screen.BookmarkListFragment">
 
+    <include
+        android:id="@+id/no_bookmark_item_view"
+        layout="@layout/no_bookmark_item_view" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

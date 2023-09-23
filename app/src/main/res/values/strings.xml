@@ -6,4 +6,6 @@
 
     <string name="bookmark_delete_message">ブックマークから削除しました。</string>
 
+    <string name="no_bookmark_message">ブックマークがありません</string>
+
 </resources>
