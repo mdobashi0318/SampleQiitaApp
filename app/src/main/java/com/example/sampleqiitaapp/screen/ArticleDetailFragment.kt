@@ -150,8 +150,7 @@ class ArticleDetailFragment : Fragment() {
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.bookmark_delete_message)
                     .setPositiveButton(R.string.ok) { _, _ ->
-                        view?.findNavController()
-                            ?.navigate(R.id.action_articleDetailFragment_to_bookmarkListFragment)
+                        view?.findNavController()?.popBackStack()
                     }
                     .setCancelable(false)
                     .show()
