@@ -16,6 +16,8 @@ class ArticleListViewModel : ViewModel() {
 
     private var date: LocalDateTime? = null
 
+    var searchStr = ""
+
     /**
     記事一覧を取得するか判定する
      **/
@@ -34,7 +36,7 @@ class ArticleListViewModel : ViewModel() {
         success: () -> Unit,
         failure: () -> Unit
     ) {
-        APIManager.get<List<Article>>("items", {
+        APIManager.get<List<Article>>("items", searchStr, {
             _articles.value = it
             success()
         }) {

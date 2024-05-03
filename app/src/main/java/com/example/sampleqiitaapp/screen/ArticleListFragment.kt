@@ -2,6 +2,7 @@ package com.example.sampleqiitaapp.screen
 
 import android.os.Bundle
 import android.view.*
+import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.MenuHost
@@ -36,7 +37,7 @@ class ArticleListFragment : Fragment() {
         swipeRefresh()
 
         if (viewModel.getArticleFlag()) getArticle() else setAdapter()
-
+        search()
         return binding.root
     }
 
@@ -142,4 +143,19 @@ class ArticleListFragment : Fragment() {
             .setNegativeButton("閉じる") { _, _ -> }
             .setCancelable(false)
             .show()
+
+
+    private fun search() {
+        binding.searchBar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String): Boolean {
+                return false
+            }
+            override fun onQueryTextSubmit(query: String): Boolean {
+                viewModel.searchStr = query
+                getArticle()
+                binding.searchBar.clearFocus()
+                return false
+            }
+        })
+    }
 }

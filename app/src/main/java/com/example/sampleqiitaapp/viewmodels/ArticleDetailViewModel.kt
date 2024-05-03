@@ -78,7 +78,7 @@ class ArticleDetailViewModel : ViewModel() {
                     now()
                 ) >= 60 * 60
             ) {
-                APIManager.get<Article>("items/${bookmark.id}", {
+                APIManager.get<Article>("items/${bookmark.id}", success = {
                     CoroutineScope(Dispatchers.Default).launch {
                         try {
                             dao.update(

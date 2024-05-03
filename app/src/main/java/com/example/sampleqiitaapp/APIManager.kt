@@ -1,5 +1,6 @@
 package com.example.sampleqiitaapp
 
+import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +9,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.net.URL
 import java.util.concurrent.TimeUnit
 
 class APIManager {
@@ -21,12 +23,26 @@ class APIManager {
 
         inline fun <reified T> get(
             api: String,
+            param: String = "",
             crossinline success: (T) -> Unit,
             crossinline failure: () -> Unit
         ) {
+
+            val uri = Uri.parse("$baseUrl$api")
+                .buildUpon()
+
+            if (param.isNotEmpty()) {
+                uri.appendQueryParameter("query", param)
+                    .build()
+            } else {
+                uri.build()
+            }
+
+
             val request = Request.Builder()
-                .url("$baseUrl$api")
+                .url(uri.toString())
                 .build()
+
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response = client.newCall(request).execute()
